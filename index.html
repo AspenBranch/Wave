@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html>
+<!-- Program exported to HTML using the KA Project Exporter by @MushyAvocado 
+https://www.khanacademy.org/computer-programming/ka-project-exporter/5195486791385088
+-->
+	
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Wave</title>
+	<style>
+		
+		
+		/* Change the color as you want */
+		:root {
+			--background-color: #000000;
+		}
+		
+		
+		html, body, #wrapper {
+			overflow: hidden;
+			width: 100%;
+		    height: 100%;
+			margin: 0px;
+			padding: 0px;
+		    width: calc(100% + 1px);
+		}
+		
+		body {
+		    background-color: var(--background-color);
+		}
+		
+		
+		canvas {
+			width: fit-content;
+			height: fit-content;
+		}
+		
+		canvas:focus {
+			outline: none;
+		}
+		
+		/* Automatically fits to the remaining height and centers the canvas it contains */
+		#wrapper {
+			padding: 0px;
+			margin: 0px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+		}
+		
+</style>
+</head>
+<body id="wrapper">
+    <!-- Canvases with a class of "sketch" are applied to the program in the order importPJS() is called. -->
+    <canvas class="sketch"></canvas>
+	<!-- Load the PJS library -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Khan/processing-js@master/processing.js"></script>
+	<!-- The exporter script must be loaded before the program script -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Mushy-Avocado/KA-exporter@main/exporter.js"></script>
+	<!-- Run Khan Academy program and import PJS -->
+	<script type="application/javascript">
+		
+		
+		function program() {
+		    
+		    title("Wave");
+		    size(600, 600);
+		    
+		    // All code goes here
+			smooth();
+			size(600,600,1);
+			
+			var keys = [];
+			var click = false;
+			var scene = 'load';
+			
+			textAlign(CENTER,CENTER);
+			var fonts = [
+			    createFont('Trebuchet MS'),
+			    createFont('Trebuchet MS Bold'),
+			];
+			
+			var c1 = color(245, 245, 255);
+			var c2 = color(0, 118, 118);
+			var c3 = color(60, 120, 170);
+			
+			var mouseRect = function(x,y,w,h){
+			    return (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h);     
+			};
+			var rectRect = function(x1,y1,w1,h1,x2,y2,w2,h2){
+			    return(x1 + w1 > x2 && y1 + h1 > y2 && x1 < x2 + w2 && y1 < y2 + h2);    
+			};
+			
+			var curLoad = 0;
+			var imgs = {
+			    backdrop:{
+			        w:600,
+			        h:600,
+			        d:function(){
+			            noStroke();
+			            
+			            background(c3);
+			            for(var i = 1200; i >= 0; i--){
+			                fill(lerpColor(c2,c3,i/1200));
+			                triangle(0,0,i,0,0,i);   
+			            }
+			            
+			            stroke(c1,10);
+			            strokeWeight(5);
+			            for(var i = 0; i < 1200; i += 50){
+			                line(0,i,i,0);
+			            }
+			            filter(BLUR,5);
+			        },
+			    },
+			    menuText:{
+			        w:600,
+			        h:200,
+			        d:function(){
+			            noStroke();
+			            
+			            background(c3);
+			            for(var i = 500; i >= 100; i--){
+			                fill(lerpColor(c2,c3,(i-100)/500));
+			                triangle(0,0,i,0,0,i);   
+			            }
+			            var img = get(0,0,600,200);
+			            
+			            background(0);
+			            fill(255);
+			            textFont(fonts[1],110);
+			            text('WAVE',300,60);
+			            textSize(22);
+			            text('By AspenBranch',300,115);
+			            strokeWeight(3);
+			            stroke(255);
+			            noStroke();
+			            var mask = get(0,0,600,200);
+			            
+			            if(img){
+			                img.mask(mask);
+			            }
+			            background(255,0);
+			            image(img,0,0);
+			            
+			        },
+			        
+			    },
+			    howText:{
+			        w:600,
+			        h:200,
+			        d:function(){
+			            background(c3);
+			            for(var i = 500; i >= 100; i--){
+			                fill(lerpColor(c2,c3,(i-100)/500));
+			                triangle(0,0,i,0,0,i);   
+			            }
+			            var img = get(0,0,600,200);
+			            
+			            background(0);
+			            fill(255);
+			            textFont(fonts[1],90);
+			            text('HOW',300,75);
+			            textSize(22);
+			            noStroke();
+			            var mask = get(0,0,600,200);
+			            
+			            if(img){
+			                img.mask(mask);
+			            }
+			            background(255,0);
+			            image(img,0,0);
+			        }
+			    },
+			    creditText:{
+			        w:600,
+			        h:200,
+			        d:function(){
+			            background(c3);
+			            for(var i = 500; i >= 100; i--){
+			                fill(lerpColor(c2,c3,(i-100)/500));
+			                triangle(0,0,i,0,0,i);   
+			            }
+			            var img = get(0,0,600,200);
+			            
+			            background(0);
+			            fill(255);
+			            textFont(fonts[1],90);
+			            text('Leaderboard',300,75);
+			            textSize(22);
+			            noStroke();
+			            var mask = get(0,0,600,200);
+			            
+			            if(img){
+			                img.mask(mask);
+			            }
+			            background(255,0);
+			            image(img,0,0);
+			        }
+			    },
+			    overText:{
+			        w:600,
+			        h:200,
+			        d:function(){
+			            background(c3);
+			            for(var i = 500; i >= 100; i--){
+			                fill(lerpColor(c2,c3,(i-100)/500));
+			                triangle(0,0,i,0,0,i);   
+			            }
+			            var img = get(0,0,600,200);
+			            
+			            background(0);
+			            fill(255);
+			            textFont(fonts[1],90);
+			            text('Game Over',300,75);
+			            textSize(22);
+			            noStroke();
+			            var mask = get(0,0,600,200);
+			            
+			            if(img){
+			                img.mask(mask);
+			            }
+			            background(255,0);
+			            image(img,0,0);
+			        }
+			    },
+			};
+			
+			var world = {
+			    y:0, 
+			    speed:2,
+			    rendered:false,
+			};
+			
+			var new_ = (function() {
+			    var obj = Object.create(this.prototype);
+			    this.apply(obj, arguments);
+			    return obj;
+			});
+			
+			var trans = {
+			    x:-600,
+			    running:false,
+			    to:null,
+			    state:1,
+			    run:function(){
+			        if(trans.running){
+			            if(trans.state === 1){
+			                trans.x = lerp(trans.x,1,0.05);
+			                if(trans.x >= 0){
+			                    scene = trans.to;
+			                    trans.state = 2;
+			                }
+			            }
+			            else if (trans.state === 2){
+			                trans.x = lerp(trans.x,801,0.05);
+			                if(trans.x >= 600){
+			                    trans.running = false;
+			                    trans.x = -600;
+			                    trans.state = 1;
+			                }
+			            }
+			            fill(c1);
+			            rect(trans.x,0,600,600);
+			        }
+			    },
+			};
+			
+			var particles = [];
+			var Particle = function(config){
+			    this.x = config.x;
+			    this.y = config.y;
+			    
+			    this.s = config.s;
+			    
+			    this.xv = config.xv;
+			    this.yv = config.yv;
+			    
+			    this.r = random(0,360);
+			    
+			    this.fadeSpeed = config.fadeSpeed || 5;
+			    this.fade = 255;
+			    
+			    this.splicing = false;
+			};
+			Particle.prototype.display = function(){
+			    noStroke();
+			    
+			    pushMatrix();
+			    translate(this.x,this.y);
+			    rotate(this.r);
+			    fill(c1,this.fade);
+			    rectMode(CENTER);
+			    rect(0,0,this.s,this.s);
+			    rectMode(CORNER);
+			    popMatrix();
+			    
+			    this.fade -= this.fadeSpeed;
+			};
+			Particle.prototype.move = function(){
+			    this.x += this.xv;
+			    this.y += this.yv;
+			    
+			    this.r += 8;
+			    
+			    //this.speed -= 0.05;
+			};
+			var runParticles = function(){
+			    for(var i = 0; i < particles.length; i ++){
+			        particles[i].display();
+			        particles[i].move();
+			        if(particles[i].fade <= 0){
+			            particles[i].splicing = true;
+			        }
+			    }
+			    for(var i = 0; i < particles.length; i ++){
+			        if(particles[i].splicing){
+			            particles.splice(i,1);   
+			        }
+			    }
+			};
+			
+			var Player = function(x,y){
+			    this.x = x;
+			    this.y = y;
+			    
+			    this.xv = 0;
+			    this.yv = 0;
+			    
+			    this.w = 30;
+			    this.h = 30;
+			    
+			    this.canJump = false;
+			    
+			    this.health = 100;
+			    this.score = 0;
+			    this.high = 0;
+			};
+			Player.prototype.draw = function() {
+			    fill(c1);
+			    rect(this.x,this.y,this.w,this.h);
+			    
+			    if(this.moving && frameCount % 5 === 0){
+			        particles.push(new_.call( Particle,{
+			            x:this.x+this.w/2,
+			            y:this.y+this.h/2,
+			            xv:-this.xv,
+			            yv:random(-4,-1),
+			            s:random(20,30),
+			        }));
+			    }
+			};
+			Player.prototype.move = function(){
+			    this.px = this.x;
+			    this.py = this.y;
+			    this.moving = false;
+			    
+			    this.x+= this.xv;
+			    this.y+=this.yv;
+			    this.yv+= 0.32;
+			    
+			    if(keys[LEFT]||keys[65]){
+			        if(this.xv > 0){
+			            this.xv = 0;
+			        }   
+			        this.xv -= 0.16;   
+			        this.moving = true;
+			    }
+			    else if(keys[RIGHT]||keys[68]){
+			        this.xv += 0.16;   
+			        if(this.xv < 0){
+			            this.xv = 0;   
+			        }
+			        this.moving = true;
+			    }
+			    else if(this.xv > 0.16){
+			        this.xv -= 0.32;
+			    }
+			    else if(this.xv < -0.16){
+			        this.xv += 0.32;   
+			    }
+			    else{
+			        this.xv = 0;   
+			    }
+			    this.xv = constrain(this.xv,-5,5);
+			    
+			    if((keys[UP]||keys[87])&&this.canJump){
+			        this.yv = -9;   
+			        this.y -= world.speed;
+			        this.canJump = false;
+			        this.moving = true;
+			    }
+			    
+			    this.x = constrain(this.x,0,600-this.w);
+			    
+			    world.speed += 0.0005;
+			};
+			Player.prototype.collide = function(x,y,w,h){
+			    if(rectRect(this.x,this.y-world.speed,this.w,this.h+world.speed,x,y,w,h)){
+			        if(this.py-world.speed + this.h <= y) {
+			            this.y = y - this.h;    
+			            this.canJump = true;
+			            this.yv=0;
+			        }
+			        if(this.px >= x + w) {
+			            this.x = x+w;
+			        }
+			        else if(this.px  <= x- this.w) {
+			            this.x = x-this.w;
+			        }
+			        else if(this.py >= y + h){
+			            this.y = this.py;
+			            this.yv = -this.yv;
+			        }  
+			    }   
+			    
+			
+			};
+			Player.prototype.displays = function(){
+			    fill(c1,100);
+			    rect(100,25,400,50,50);
+			    ellipse(50,50,50,50);
+			    ellipse(550,50,50,50);
+			    
+			    
+			    fill(c1);
+			    rect(105,30,this.health * 3.9, 40,50);
+			    
+			    textFont(fonts[1],35);
+			    text(~~this.score,50,50);
+			    text(~~this.high,550,50);
+			    
+			    textFont(fonts[0],20);
+			    text('Score',50,10);
+			    text('Health',300,10);
+			    text('High',550,10);
+			    this.score += 0.01;
+			    
+			    if(this.health < 100){
+			        this.health += 0.05;   
+			    }
+			    if(this.high < this.score){
+			        this.high = this.score;   
+			    }
+			};
+			var player = new_.call(Player,300,300);
+			
+			var spikes = [];
+			var Spike = function(x,y){
+			    this.x = x;
+			    this.y = y;
+			    this.w = 30;
+			    this.h = 30;
+			    
+			    this.splicing = false;
+			};
+			Spike.prototype.display = function(){
+			    fill(c1);
+			    triangle(this.x,this.y+31,this.x+15,this.y+31,this.x+7,this.y);
+			    triangle(this.x+15,this.y+31,this.x+30,this.y+31,this.x+22,this.y);
+			};
+			Spike.prototype.collide = function(){
+			    if(rectRect(this.x,this.y,this.w,this.h,player.x,player.y,player.w,player.h)){
+			        player.health --;
+			    }
+			};  
+			Spike.prototype.move = function(){
+			    this.y -= world.speed;
+			    if(this.y < -this.h){
+			        this.splicing = true;   
+			    }
+			};
+			var runSpikes = function(){
+			    for(var i = 0; i < spikes.length; i ++){
+			        spikes[i].display();
+			        spikes[i].move();
+			        spikes[i].collide();
+			    }
+			    for(var i = 0; i < spikes.length; i ++){
+			        if(spikes[i].splicing){
+			            spikes.splice(i,1);   
+			        }
+			    }
+			};
+			
+			var coins = [];
+			var Coin = function(x,y){
+			    this.x = x;
+			    this.y = y;
+			    
+			    this.d = 20;
+			    
+			    this.hidden = false;
+			    this.splicing = false;
+			    
+			    this.fade = 255;
+			    
+			    this.rand = random(0,360);
+			};
+			Coin.prototype.display = function(){
+			    if(!this.hidden){
+			        pushMatrix();
+			        translate(this.x,this.y);
+			        rotate(cos((frameCount+this.rand)*3) * 30);
+			        
+			        fill(c1);
+			        ellipse(0,0,this.d,this.d);
+			        
+			        fill(lerpColor(c2,c3,0.5));
+			        textFont(fonts[1],16);
+			        text('$',0,0);
+			        popMatrix();
+			    }
+			    else{
+			        this.y --;
+			        this.fade -= 8;
+			        
+			        fill(c1,this.fade);
+			        textFont(fonts[1],20);
+			        
+			        text('+5',this.x,this.y);
+			    }
+			};
+			Coin.prototype.collect = function(){
+			    if(rectRect(player.x,player.y,player.w,player.h,this.x-this.d/2,this.y-this.d/2,this.d,this.d)&& !this.hidden){
+			        this.hidden = true;
+			        player.score += 5;
+			    }
+			};
+			Coin.prototype.move = function(){
+			    this.y -= world.speed;
+			    if(this.y < -this.h){
+			        this.splicing = true;   
+			    }
+			};
+			var runCoins = function(){
+			    for(var i = 0; i < coins.length; i ++){
+			        coins[i].display();
+			        coins[i].move();
+			        coins[i].collect();
+			    }
+			    for(var i = 0; i < coins.length; i ++){
+			        if(coins[i].splicing){
+			            coins.splice(i,1);   
+			        }
+			    }   
+			};
+			    
+			var platforms = [];
+			var Platform = function(x,y,w,h){
+			    this.x = x;  
+			    this.y = y;
+			    this.w = w;
+			    this.h = h;
+			    
+			    this.splicing = false;
+			};
+			Platform.prototype.draw = function() {
+			    fill(c1);
+			    noStroke();
+			    rect(this.x,this.y,this.w,this.h);
+			    
+			    if(frameCount % 2 === 0){
+			        particles.push(new_.call(Particle,{
+			            x:this.x+random(0,this.w),
+			            y:this.y,
+			            xv:random(-1,1),
+			            yv:random(-4,-2),
+			            s:random(5,10),
+			        }));
+			    }
+			};
+			Platform.prototype.move = function(){
+			    this.y -= world.speed;
+			    if(this.y < -this.h){
+			        this.splicing = true;   
+			    }
+			};
+			var runPlatforms = function(){
+			    for(var i = 0; i < platforms.length; i ++){
+			        player.collide(platforms[i].x,platforms[i].y,platforms[i].w,platforms[i].h);   
+			        platforms[i].draw();
+			        platforms[i].move();
+			    }
+			    for(var i = 0; i < platforms.length; i ++){
+			        if(platforms[i].splicing){
+			            platforms.splice(i,1);   
+			        }
+			    }  
+			};
+			
+			world.add = function(){
+			    while(platforms.length < 12){
+			        var x = random(30,570);
+			        
+			        if(!world.rendered){
+			            world.y+= random(150,170);
+			            platforms.push(new_.call( Platform,x,world.y+400,600,50));
+			            platforms.push(new_.call(Platform,x-660,world.y+400,600,50));
+			            for(var i = 0; i < random(-1,3); i ++){
+			                spikes.push(new_.call(Spike,random(x,x+570),world.y + 370));
+			                spikes.push(new_.call(Spike,random(x-600,x-90),world.y + 370));  
+			            }
+			            
+			            for(var i = 0; i < random(-1,3); i ++){
+			                coins.push(new_.call(Coin,random(x,x+570),world.y + 380));
+			                coins.push(new_.call(Coin,random(x-600,x-90),world.y + 380));  
+			            }
+			        }
+			        else{
+			            platforms.push(new_.call(Platform,x,world.y,600,50));
+			            platforms.push(new_.call(Platform,x-660,world.y,600,50));
+			            
+			            for(var i = 0; i < random(-1,3); i ++){
+			                spikes.push(new_.call(Spike,random(x,x+570),world.y -30));
+			                spikes.push(new_.call(Spike,random(x-600,x-90),world.y -30));  
+			            }
+			            for(var i = 0; i < random(-1,3); i ++){
+			                coins.push(new_.call(Coin,random(x,x+570),world.y -20));
+			                coins.push(new_.call(Coin,random(x-600,x-90),world.y -20));  
+			            }
+			        }
+			    }
+			    world.rendered = true;
+			};
+			
+			var Button = function(x,y,txt,to){
+			    this.x = x;
+			    this.y = y;
+			    this.w = 400;
+			    this.h = 60;
+			    
+			    this.txt = txt;
+			    this.to = to;
+			    
+			    this.clr = lerpColor(c2,c3,0.5);
+			    
+			    this.l = 0;
+			};
+			Button.prototype.display = function(){
+			    fill(lerpColor(c1,color(this.clr,0),this.l));
+			    stroke(c1);
+			    strokeWeight(3);
+			    rect(this.x,this.y,this.w,this.h,20);
+			    
+			    fill(lerpColor(this.clr,c1,this.l));
+			    textFont(fonts[1],40);    
+			    text(this.txt,this.x+this.w/2,this.y+this.h/2);
+			    
+			    noStroke();
+			};
+			Button.prototype.update = function(){
+			    if(mouseRect(this.x,this.y,this.w,this.h)){
+			        this.l = lerp(this.l,1,0.05);
+			        if(click){
+			            trans.running = true;
+			            trans.to = this.to;
+			            
+			            player.x = 300;
+			            player.y = 300;
+			            player.health = 100;
+			            player.score = 0;
+			            particles = [];
+			            platforms = [];
+			            coins = [];
+			            spikes = [];
+			            world.rendered = false;
+			            world.speed = 2;
+			            world.y = 0;
+			        }
+			    }
+			    else{
+			        this.l = lerp(this.l,0,0.05);   
+			    }
+			};
+			Button.prototype.run = function(){
+			    this.display();
+			    this.update();
+			};
+			var btns = {
+			    play:new_.call(Button,100,250,'Play','play'),
+			    how:new_.call(Button,100,350,'How','how'),
+			    credit:new_.call(Button,100,450,'Lead','credit'),
+			    home:new_.call(Button,100,450,'Home','menu'),
+			    replay:new_.call(Button,100,400,'Replay','play'),
+			    menu:new_.call(Button,100,500,'Home','menu'),
+			};
+			
+			var menu = function(){
+			    image(imgs.backdrop,0,0);
+			    
+			    fill(c1);
+			    fill(c1,200);
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos((i+frameCount)/600*360)*20+170);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE); 
+			    
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos(((i+120)+frameCount)/600*360)*20+175);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE);
+			    
+			    image(imgs.menuText,0,0);
+			    
+			    btns.play.run();
+			    btns.how.run();
+			    btns.credit.run();
+			};
+			var play = function(){
+			    image(imgs.backdrop,0,0);
+			    
+			    
+			    world.add();
+			    
+			    
+			    runPlatforms();
+			    runSpikes();
+			    runCoins();
+			    
+			    player.draw();
+			    player.move();
+			    
+			    runParticles();
+			    
+			    player.displays();
+			    
+			    if(player.health < 0 || player.y > 600 || player.y < -30){
+			        trans.running = true;
+			        trans.to = 'over';
+			    }
+			};
+			var load = function(){
+			    if(curLoad < Object.keys(imgs).length ){
+			        background(255,0);
+			        var img = imgs[Object.keys(imgs)[curLoad]];
+			        img.d();
+			        imgs[Object.keys(imgs)[curLoad]] = get(0,0,img.w,img.h);
+			        background(0,0,0,0);
+			        curLoad++;
+			        if(curLoad === Object.keys(imgs).length ){
+			            scene = 'menu';
+			        }
+			    }
+			    background(0);
+			    fill(c1);
+			    textSize(width/15);
+			    textFont(fonts[1],width/15);
+			    text("Loading... "+~~(curLoad / +Object.keys(imgs).length*100)+'%',width/2,height/2);
+			};
+			var how = function(){
+			    image(imgs.backdrop,0,0);
+			    
+			    fill(c1,200);
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos((i+frameCount)/600*360)*20+170);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE); 
+			    
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos(((i+120)+frameCount)/600*360)*20+175);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE);
+			    
+			    image(imgs.howText,0,0);
+			    
+			    fill(c1);
+			    textFont(fonts[0],25);
+			    text('Arrows or WASD to move. Collect coins and avoid spikes. Dont fall off the bottom or top of the screen.',100,250,400,150);
+			    
+			    btns.home.run();
+			};
+			var credit = function(){
+			    image(imgs.backdrop,0,0);
+			    
+			    fill(c1,200);
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos((i+frameCount)/600*360)*20+170);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE); 
+			    
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos(((i+120)+frameCount)/600*360)*20+175);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE);
+			    
+			    image(imgs.creditText,0,0);
+			    
+			    fill(c1);
+			    textFont(fonts[0],25);
+			    text('84 - AspenBranch',100,250,400,150);
+			    
+			    btns.home.run();
+			};
+			var over = function(){
+			    image(imgs.backdrop,0,0);
+			    
+			    fill(c1,200);
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos((i+frameCount)/600*360)*20+170);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE); 
+			    
+			    beginShape();
+			    vertex(600,0);
+			    vertex(0,0);
+			    vertex(0,150);
+			    for(var i = 0; i < 700; i += 100){
+			        curveVertex(i,cos(((i+120)+frameCount)/600*360)*20+175);
+			    }
+			    vertex(600,150);
+			    vertex(600,150);
+			    vertex(600,0);
+			    endShape(CLOSE);
+			    
+			    image(imgs.overText,0,0);
+			    
+			    fill(c1);
+			    textFont(fonts[0],25);
+			    text('You died. :)',97,225,406,70);
+			    
+			    textFont(fonts[1],30);
+			    text('High: ' + ~~player.high + '   Current: '+~~player.score,300,350);
+			    
+			    btns.menu.run();
+			    btns.replay.run();
+			};
+			
+			draw = function() {
+			    switch(scene){
+			        case 'load':
+			            load();
+			        break;
+			        case 'play':
+			            play();
+			        break;
+			        case 'menu':
+			            menu();
+			        break;
+			        case 'how':
+			            how();
+			        break;
+			        case 'credit':
+			            credit();
+			        break;
+			        case 'over':
+			            over();
+			        break;
+			    }
+			    
+			    
+			    fill(c1);
+			    textFont(fonts[0],10);
+			    text(this.__frameRate ,20,590);
+			    
+			    trans.run();
+			    click = false;
+			    
+			    
+			};
+			
+			keyPressed = function(){
+			    keys[keyCode] = true;
+			};
+			keyReleased = function(){
+			    keys[keyCode] = false;
+			};
+			
+			mouseClicked = function(){
+			    click = true;  
+			};
+		}
+		
+		runPJS(program);
+		
+		// Add reload button on KA --> <script>
+		
+	</script>
+</body>
+
+</html>
