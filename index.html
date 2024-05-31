@@ -84,7 +84,9 @@ https://www.khanacademy.org/computer-programming/ka-project-exporter/51954867913
 			var keys = [];
 			var click = false;
 			var scene = 'load';
-			
+			var leftHover = false;
+      var rightHover = false;
+
 			textAlign(CENTER,CENTER);
 			var fonts = [
 			    createFont('Trebuchet MS'),
@@ -361,51 +363,47 @@ https://www.khanacademy.org/computer-programming/ka-project-exporter/51954867913
 			        }));
 			    }
 			};
-			Player.prototype.move = function(){
-			    this.px = this.x;
-			    this.py = this.y;
-			    this.moving = false;
-			    
-			    this.x+= this.xv;
-			    this.y+=this.yv;
-			    this.yv+= 0.32;
-			    
-			    if(keys[LEFT]||keys[65]){
-			        if(this.xv > 0){
-			            this.xv = 0;
-			        }   
-			        this.xv -= 0.16;   
-			        this.moving = true;
-			    }
-			    else if(keys[RIGHT]||keys[68]){
-			        this.xv += 0.16;   
-			        if(this.xv < 0){
-			            this.xv = 0;   
-			        }
-			        this.moving = true;
-			    }
-			    else if(this.xv > 0.16){
-			        this.xv -= 0.32;
-			    }
-			    else if(this.xv < -0.16){
-			        this.xv += 0.32;   
-			    }
-			    else{
-			        this.xv = 0;   
-			    }
-			    this.xv = constrain(this.xv,-5,5);
-			    
-			    if((keys[UP]||keys[87])&&this.canJump){
-			        this.yv = -9;   
-			        this.y -= world.speed;
-			        this.canJump = false;
-			        this.moving = true;
-			    }
-			    
-			    this.x = constrain(this.x,0,600-this.w);
-			    
-			    world.speed += 0.0005;
-			};
+			Player.prototype.move = function() {
+    this.px = this.x;
+    this.py = this.y;
+    this.moving = false;
+
+    this.x += this.xv;
+    this.y += this.yv;
+    this.yv += 0.32;
+
+    if (keys[LEFT] || keys[65] || leftHover) {
+        if (this.xv > 0) {
+            this.xv = 0;
+        }
+        this.xv -= 0.16;
+        this.moving = true;
+    } else if (keys[RIGHT] || keys[68] || rightHover) {
+        this.xv += 0.16;
+        if (this.xv < 0) {
+            this.xv = 0;
+        }
+        this.moving = true;
+    } else if (this.xv > 0.16) {
+        this.xv -= 0.32;
+    } else if (this.xv < -0.16) {
+        this.xv += 0.32;
+    } else {
+        this.xv = 0;
+    }
+    this.xv = constrain(this.xv, -5, 5);
+
+    if ((keys[UP] || keys[87]) && this.canJump) {
+        this.yv = -9;
+        this.y -= world.speed;
+        this.canJump = false;
+        this.moving = true;
+    }
+
+    this.x = constrain(this.x, 0, 600 - this.w);
+
+    world.speed += 0.0005;
+};
 			Player.prototype.collide = function(x,y,w,h){
 			    if(rectRect(this.x,this.y-world.speed,this.w,this.h+world.speed,x,y,w,h)){
 			        if(this.py-world.speed + this.h <= y) {
@@ -887,37 +885,57 @@ https://www.khanacademy.org/computer-programming/ka-project-exporter/51954867913
 			};
 			
 			draw = function() {
-			    switch(scene){
-			        case 'load':
-			            load();
-			        break;
-			        case 'play':
-			            play();
-			        break;
-			        case 'menu':
-			            menu();
-			        break;
-			        case 'how':
-			            how();
-			        break;
-			        case 'credit':
-			            credit();
-			        break;
-			        case 'over':
-			            over();
-			        break;
-			    }
-			    
-			    
-			    fill(c1);
-			    textFont(fonts[0],10);
-			    text(this.__frameRate ,20,590);
-			    
-			    trans.run();
-			    click = false;
-			    
-			    
-			};
+    switch(scene){
+        case 'load':
+            load();
+        break;
+        case 'play':
+            play();
+        break;
+        case 'menu':
+            menu();
+        break;
+        case 'how':
+            how();
+        break;
+        case 'credit':
+            credit();
+        break;
+        case 'over':
+            over();
+        break;
+    }
+
+    fill(c1);
+    textFont(fonts[0],10);
+    text(this.__frameRate ,20,590);
+
+    // Detect mouse hover for left and right controls
+    if (mouseX < width * 0.2) {
+        leftHover = true;
+        rightHover = false;
+    } else if (mouseX > width * 0.8) {
+        rightHover = true;
+        leftHover = false;
+    } else {
+        leftHover = false;
+        rightHover = false;
+    }
+
+    // Display left and right hover areas
+    if (leftHover) {
+        fill(255, 0, 0, 50); // Red semi-transparent
+        rect(0, 0, width * 0.2, height);
+    }
+    if (rightHover) {
+        fill(0, 0, 255, 50); // Blue semi-transparent
+        rect(width * 0.8, 0, width * 0.2, height);
+    }
+
+    trans.run();
+    click = false;
+};
+
 			
 			keyPressed = function(){
 			    keys[keyCode] = true;
